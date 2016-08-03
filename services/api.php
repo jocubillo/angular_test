@@ -36,10 +36,6 @@
 			else
 				$this->response('',404);
 
-			// if((int)method_exists($this,$func) > 0)
-			// 	$this->$func();
-			// else
-			// 	$this->response('',404);
 		}
 
 		private function users(){	
@@ -74,6 +70,18 @@
 				$this->response($this->json($result), 200); // send user details
 			}
 			$this->response('',204);	// If no records "No Content" status
+		}
+
+		private function adduser($queryvar){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
+			}
+			$query = sprintf("INSERT INTO users(name,email) VALUES('%s','%s')", $queryvar['name'],$queryvar['email']);
+			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+
+			if( $r ){
+				$this->response('',200);
+			}
 		}
 
 		private function json($data){
