@@ -63,10 +63,13 @@
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 
 			if($r->num_rows > 0){
-				$result = array();
-				while($row = $r->fetch_assoc()){
-					$result[] = $row;	
-				}
+				// $result = array();
+				// while($row = $r->fetch_assoc()){
+				// 	$result[] = $row;	
+				// }
+				// $this->response($this->json($result), 200); // send user details
+				$row = $r->fetch_assoc();
+				$result = $row;
 				$this->response($this->json($result), 200); // send user details
 			}
 			$this->response('',204);	// If no records "No Content" status
@@ -76,12 +79,51 @@
 			if($this->get_request_method() != "POST"){
 				$this->response('',406);
 			}
-			$query = sprintf("INSERT INTO users(name,email) VALUES('%s','%s')", $queryvar['name'],$queryvar['email']);
+			
+			$name = $queryvar['name'];
+			$email = $queryvar['email'];
+
+			$query = sprintf("INSERT INTO users(name,email) VALUES('%s','%s')", $name,$email);
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 
 			if( $r ){
-				$this->response('',200);
+				$this->response($this->json($query),200);
 			}
+			$this->response('',204);	// If no records "No Content" status
+		}
+
+		private function updateUser($queryvar){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
+			}
+			
+			$id = $queryvar['id'];
+			$name = $queryvar['name'];
+			$email = $queryvar['email'];
+
+			$query = sprintf("UPDATE users set name = '%s', email='%s' where id = %d", $name,$email,$id);
+			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+
+			if( $r ){
+				$this->response($this->json($query),200);
+			}
+			$this->response('',204);	// If no records "No Content" status
+		}
+
+		private function deleteUser($queryvar){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
+			}
+
+			$id = $queryvar['id'];
+
+			$query = sprintf("DELETE FROM users where id = %d",$id);
+			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
+
+			if( $r ){
+				$this->response($this->json($query),200);
+			}
+			$this->response('',204);	// If no records "No Content" status
 		}
 
 		private function json($data){

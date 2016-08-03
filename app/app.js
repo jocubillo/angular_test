@@ -12,7 +12,58 @@ app.factory("services", ['$http', function($http){
 	};
 	
 	obj.addUser = function(user){
-		return $http.post(serviceBase + 'adduser', user).then(function (results){
+		var qrystr = Object.keys(user).map(function(key){ 
+			return encodeURIComponent(key) + '=' + encodeURIComponent(user[key]); 
+		}).join('&');
+		
+		var req = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			url: serviceBase + 'addUser',
+			data: qrystr
+		};
+
+		return $http(req).then(function (results){
+			return results;
+		});
+	}
+
+	obj.updateUser = function(user){
+		var qrystr = Object.keys(user).map(function(key){ 
+			return encodeURIComponent(key) + '=' + encodeURIComponent(user[key]); 
+		}).join('&');
+		
+		var req = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			url: serviceBase + 'updateUser',
+			data: qrystr
+		};
+
+		return $http(req).then(function (results){
+			return results;
+		});
+	}
+
+	obj.deleteUser = function(user){
+		var qrystr = Object.keys(user).map(function(key){ 
+			return encodeURIComponent(key) + '=' + encodeURIComponent(user[key]); 
+		}).join('&');
+		
+		var req = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			url: serviceBase + 'deleteUser',
+			data: qrystr
+		};
+
+		return $http(req).then(function (results){
 			return results;
 		});
 	}
@@ -25,29 +76,56 @@ app.controller('listCtrl', function ($scope, services){
 	services.getUsers().then(function (data){
 		$scope.users = data.data;
 	});
+
+	$scope.deleteUserData = function(id){
+		var conf = confirm("Are you sure you want to delete?");
+		if( conf == true ){
+			var formdata = {};
+			formdata.id = id;
+
+			services.deleteUser(formdata).then(function(r){
+				$scope.result = r;
+				alert('DELETED!');
+				window.location.reload();
+			});
+		}
+	}
 });
 
 app.controller('viewCtrl', function ($scope, services, $routeParams ){
 	var user_id = ($routeParams.userId) ? parseInt($routeParams.userId) : 0;
 	services.getUser(user_id).then(function (data){
-		$scope.user = data.data;
+		$scope.id = data.data.id;
+		$scope.name = data.data.name;
+		$scope.email = data.data.email;
 	});
+
+	$scope.updateUserData = function(){
+		var formdata = {};
+		formdata.id = $scope.id;
+		formdata.name = $scope.name;
+		formdata.email = $scope.email;
+
+		services.updateUser(formdata).then(function (r){
+			$scope.result = r;
+		});
+
+		$scope.console = "Update SUCCESFULL!";
+	}
 });
 
 app.controller('addCtrl', function ($scope, services){
-	services.getUsers().then(function(data){
-		$scope.console = "Fill up the form";
-		$scope.processAddUser = function(){
-			$scope.console = "Thank you " + $scope.name + ' | ' + $scope.email;
-			var formdata = [];
-			formdata.name = $scope.name;
-			formdata.email = $scope.email;
+	$scope.console = "Fill up the form";
+	$scope.processAddUser = function(){
+		$scope.console = "Thank you " + $scope.name + ' | ' + $scope.email;
+		var formdata = {};
+		formdata.name = $scope.name;
+		formdata.email = $scope.email;
 
-			services.addUser(formdata).then(function (r){
-				$scope.result = r;
-			})
-		}
-	});
+		services.addUser(formdata).then(function (r){
+			$scope.result = r;
+		});
+	}
 });
 
 app.config(['$routeProvider',

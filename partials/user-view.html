@@ -1,7 +1,12 @@
 <a href="/angular_test/#/">Back</a>
 
-<div ng-repeat="data in user">
-<p>ID : {{data.id}}</p>
-<p>Name : {{data.name}}</p>
-<p>Email : {{data.email}}</p>
-</div>
+<form ng-submit="updateUserData()">
+	<input type="hidden" name="id" ng-model="id" />
+	<p> Name : <input type="text" ng-model="name" name="name" required /> </p>
+	<p> Email : <input type="email" ng-model="email" name="email" required /> </p>
+	<p>
+		<input type="submit" value="Update">
+	</p>
+
+	<p>{{console}}</p>
+</form>
