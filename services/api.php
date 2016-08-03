@@ -5,9 +5,9 @@
 		public $data = "";
 		
 		const DB_SERVER = "127.0.0.1";
-		const DB_USER = "root";
-		const DB_PASSWORD = "";
-		const DB = "testdb";
+		const DB_USER = "power_for_test";
+		const DB_PASSWORD = "admin1234";
+		const DB = "power_mris_test";
 
 		private $db = NULL;
 		private $mysqli = NULL;
@@ -23,10 +23,23 @@
 
 		public function processApi(){
 			$func = strtolower(trim(str_replace("/","",$_REQUEST['x'])));
+
+			$method  = $this->get_request_method(); 
+			$method_arr = array(
+				'GET' => $_GET,
+				'REQUEST' => $_REQUEST,
+				'POST' => $_POST
+			);
+
 			if((int)method_exists($this,$func) > 0)
-				$this->$func();
+				$this->$func( $method_arr[$method] );
 			else
 				$this->response('',404);
+
+			// if((int)method_exists($this,$func) > 0)
+			// 	$this->$func();
+			// else
+			// 	$this->response('',404);
 		}
 
 		private function users(){	
@@ -46,17 +59,17 @@
 			$this->response('',204);	// If no records "No Content" status
 		}
 
-		private function user($user_id){
+		private function user($qrydata){
 			if($this->get_request_method() != "GET"){
 				$this->response('',406);
 			}
-			$query = sprintf("SELECT * FROM users where id = %d", $user_id);
+			$query = sprintf("SELECT * FROM users where id = %d", $qrydata['id']);
 			$r = $this->mysqli->query($query) or die($this->mysqli->error.__LINE__);
 
 			if($r->num_rows > 0){
 				$result = array();
 				while($row = $r->fetch_assoc()){
-					$result[] = $row;
+					$result[] = $row;	
 				}
 				$this->response($this->json($result), 200); // send user details
 			}
