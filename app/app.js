@@ -23,7 +23,7 @@ app.controller('listCtrl', function ($scope, services){
 
 app.controller('viewCtrl', function ($scope, services, $routeParams ){
 	var user_id = ($routeParams.userId) ? parseInt($routeParams.userId) : 0;
-	services.getUser().then(function(data){
+	services.getUser(user_id).then(function(data){
 		$scope.user = data.data;
 	});
 });
